@@ -45,21 +45,22 @@ function main() {
             camera.position.z += 1;
         }
         //rotation
-        if(key == "ArrowUp"){
+        if(key == "ArrowLeft"){
             camera.rotation.y += .1;
         }
-        if(key == "ArrowDown"){
+        if(key == "ArrowRight"){
             camera.rotation.y -= .1;
         }
-        if(key == "ArrowLeft"){
+        if(key == "ArrowDown"){
             camera.rotation.x -= .1;
         }
-        if(key == "ArrowRight"){
+        if(key == "ArrowUp"){
             camera.rotation.x += .1;
         }
         if(key == ","){
             camera.rotation.z -= .1;
-        }if(key == "."){
+        }
+        if(key == "."){
             camera.rotation.z += .1;
         }
     }
