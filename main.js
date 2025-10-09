@@ -22,6 +22,48 @@ function main() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+    //let's try to get a (really quite bad) camera control system
+    document.addEventListener("keydown", onKeyDown)
+    function onKeyDown(event){
+        var key = event.key
+        if(key == "w"){
+            camera.position.y += 1;
+        }
+        if(key == "s"){
+            camera.position.y -= 1;
+        }
+        if(key == "a"){
+            camera.position.x -= 1;
+        }
+        if(key == "d"){
+            camera.position.x += 1;
+        }
+        if(key == "q"){
+            camera.position.z -= 1;
+        }
+        if(key == "e"){
+            camera.position.z += 1;
+        }
+        //rotation
+        if(key == "ArrowUp"){
+            camera.rotation.y += .1;
+        }
+        if(key == "ArrowDown"){
+            camera.rotation.y -= .1;
+        }
+        if(key == "ArrowLeft"){
+            camera.rotation.x -= .1;
+        }
+        if(key == "ArrowRight"){
+            camera.rotation.x += .1;
+        }
+        if(key == ","){
+            camera.rotation.z -= .1;
+        }if(key == "."){
+            camera.rotation.z += .1;
+        }
+    }
+
     //define materials for it
     function newSphere(radius, color, texture = null, x, y, z, options = {}) {
     const geometry = new THREE.SphereGeometry(radius);
@@ -38,7 +80,7 @@ function main() {
     const earthTexture = new THREE.TextureLoader().load('assets/8k_earth_daymap.jpg');
     const sun = newSphere(2, 0x00ff00, sunTexture, 0, 0, 0, {emissive: 0xffaa33, emissiveIntensity: 1000000000});
     const earth = newSphere(.4, 0xffffff, earthTexture, 6, 0, 0);
-    camera.position.z = 5;
+    camera.position.z = 8;
 
     //throw in a temp light
     const light = new THREE.PointLight(0xffffff,100,100);
