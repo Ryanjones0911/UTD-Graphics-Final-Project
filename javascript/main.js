@@ -1,11 +1,11 @@
 import * as THREE from 'three';
+import * as Planets from './planets.js';
 
 function main() {
   //let's just get a sphere on screen
   //NOTE: may be a good idea to give objects their own files
 
   //simple camera
-
   const cameraAttributes = {
     fov: 80,
     aspectRatio: window.innerWidth / window.innerHeight,
@@ -67,24 +67,20 @@ function main() {
     }
   }
 
-  //define materials for it
-  function newSphere(radius, color, texture = null, x, y, z, options = {}) {
-    const geometry = new THREE.SphereGeometry(radius);
-    const material = new THREE.MeshPhongMaterial({
-      map: texture,
-      ...options,
-    });
-    const sphere = new THREE.Mesh(geometry, material);
-    sphere.position.set(x, y, z)
-    scene.add(sphere);
-    return sphere;
-  }
-
-  const sunTexture = new THREE.TextureLoader().load('assets/8k_sun.jpg');
-  const earthTexture = new THREE.TextureLoader().load('assets/8k_earth_daymap.jpg');
-  const sun = newSphere(2, 0x00ff00, sunTexture, 0, 0, 0, { emissive: 0xffaa33, emissiveIntensity: .8, transparent: true, opacity: 1 });
-  const earth = newSphere(.4, 0xffffff, earthTexture, 6, 0, 0);
   camera.position.z = 8;
+
+  const sun = Planets.createBody(scene, 5, 1, 0, 0, 0, 'assets/8k_sun.jpg', {
+    emissive: 0xffaa33,
+    emissiveIntensity: .8,
+    transparent: true,
+    opacity: 1
+  })
+
+  const earth = Planets.createBody(scene, 5, .09168, 2, 0, 0, 'assets/8k_earth_daymap.jpg');
+
+  const mars = Planets.createBody(scene, 5, .0488, 2.5, 0, 0, 'assets/mars6ksurface.jpg', {
+    //color: 0xff0000
+  });
 
   //throw in a temp light
   const light = new THREE.PointLight(0xffffff, 100, 100);
@@ -97,6 +93,7 @@ function main() {
   function animate() {
     sun.rotation.y += .002;
     earth.rotation.y += .002;
+    mars.rotation.y += .002;
 
 
 
