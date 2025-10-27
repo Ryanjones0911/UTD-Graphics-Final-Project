@@ -76,11 +76,23 @@ function main() {
     opacity: 1
   })
 
+  const mercury = Planets.createBody(scene, 5, .035, 1.3, 0, 0);
+
+  const venus = Planets.createBody(scene, 5, .0869, 1.6, 0, 0);
+
   const earth = Planets.createBody(scene, 5, .09168, 2, 0, 0, 'assets/8k_earth_daymap.jpg');
 
   const mars = Planets.createBody(scene, 5, .0488, 2.5, 0, 0, 'assets/mars6ksurface.jpg', {
     //color: 0xff0000
   });
+
+  const jupiter = Planets.createBody(scene, 5, .1028, 4.2, 0, 0);
+
+  const saturn = Planets.createBody(scene, 5, .0866, 8.5, 0, 0);
+
+  const uranus = Planets.createBody(scene, 5, .0367, 17, 0, 0);
+
+  const neptune = Planets.createBody(scene, 5, .0355, 28, 0, 0);
 
   //throw in a temp light
   const light = new THREE.PointLight(0xffffff, 100, 100);
