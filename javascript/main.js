@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import * as Planets from './planets.js';
+import * as CameraControls from './cameraControls.js';
+import { OrbitControls } from 'three/examples/jsm/Addons.js';
 
 function main() {
   //let's just get a sphere on screen
@@ -24,50 +26,13 @@ function main() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  //let's try to get a (really quite bad) camera control system
-  document.addEventListener("keydown", onKeyDown)
-  function onKeyDown(event) {
-    var key = event.key
-    if (key == "w") {
-      camera.position.y += 1;
-    }
-    if (key == "s") {
-      camera.position.y -= 1;
-    }
-    if (key == "a") {
-      camera.position.x -= 1;
-    }
-    if (key == "d") {
-      camera.position.x += 1;
-    }
-    if (key == "q") {
-      camera.position.z -= 1;
-    }
-    if (key == "e") {
-      camera.position.z += 1;
-    }
-    //rotation
-    if (key == "ArrowLeft") {
-      camera.rotation.y += .1;
-    }
-    if (key == "ArrowRight") {
-      camera.rotation.y -= .1;
-    }
-    if (key == "ArrowDown") {
-      camera.rotation.x -= .1;
-    }
-    if (key == "ArrowUp") {
-      camera.rotation.x += .1;
-    }
-    if (key == ",") {
-      camera.rotation.z -= .1;
-    }
-    if (key == ".") {
-      camera.rotation.z += .1;
-    }
-  }
 
   camera.position.z = 8;
+
+  const controls = CameraControls.controlsInit(camera, renderer.domElement);
+
+  //create some planets
+  const planets = [];
 
   const sun = Planets.createBody(scene, 5, 1, 0, 0, 0, 'assets/8k_sun.jpg', {
     emissive: 0xffaa33,
@@ -75,24 +40,55 @@ function main() {
     transparent: true,
     opacity: 1
   })
+  planets.push(sun);
+
+  
 
   const mercury = Planets.createBody(scene, 5, .035, 1.3, 0, 0);
+  planets.push(mercury);
 
   const venus = Planets.createBody(scene, 5, .0869, 1.6, 0, 0);
+  planets.push(venus);
 
   const earth = Planets.createBody(scene, 5, .09168, 2, 0, 0, 'assets/8k_earth_daymap.jpg');
+  planets.push(earth);
 
   const mars = Planets.createBody(scene, 5, .0488, 2.5, 0, 0, 'assets/mars6ksurface.jpg', {
     //color: 0xff0000
   });
+  planets.push(mars);
 
   const jupiter = Planets.createBody(scene, 5, .1028, 4.2, 0, 0);
+  planets.push(jupiter);
 
   const saturn = Planets.createBody(scene, 5, .0866, 8.5, 0, 0);
+  planets.push(saturn);
 
   const uranus = Planets.createBody(scene, 5, .0367, 17, 0, 0);
+  planets.push(uranus);
 
   const neptune = Planets.createBody(scene, 5, .0355, 28, 0, 0);
+  planets.push(neptune);
+
+
+  //handle mouse clicking on planets
+  window.addEventListener('mousedown', onMouseDown);
+  function onMouseDown(event) {
+    //calculate mouse position in normalized device coordinates
+    //(-1 to +1) for both components
+    const mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(planets);
+    if (intersects.length > 0) {
+      console.log("Clicked on planet at position: ", intersects[0].object.position);
+      CameraControls.changeCameraTarget(controls, intersects[0].object.position);
+    }
+  }
 
   //throw in a temp light
   const light = new THREE.PointLight(0xffffff, 100, 100);
@@ -102,14 +98,13 @@ function main() {
 
 
 
+
   function animate() {
     sun.rotation.y += .002;
     earth.rotation.y += .002;
     mars.rotation.y += .002;
 
-
-
-
+    CameraControls.updateCamera(controls);
     renderer.render(scene, camera);
   }
   renderer.setAnimationLoop(animate);
