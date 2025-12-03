@@ -165,14 +165,33 @@ function main() {
     case '1': // slow time
       timeScale = Math.max(MIN_TIME_SCALE, timeScale * 0.8);
       console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
       break;
 
     case '2': // speed up time
       timeScale = Math.min(MAX_TIME_SCALE, timeScale * 1.25);
       console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
       break;
+    }
+  });
+
+  // Element to display time scale to user
+  const timeScaleDisplay = document.createElement('div'); 
+  timeScaleDisplay.id = 'time-scale-display';
+  document.body.appendChild(timeScaleDisplay);
+
+  let fadeTimeout = null;
+  //Function to display the time scale before fading it back out
+  function showTimeScale() {
+    timeScaleDisplay.textContent = `Time Scale: ${timeScale.toFixed(2)}×`;
+    timeScaleDisplay.classList.add('visible');
+
+    clearTimeout(fadeTimeout);
+    fadeTimeout = setTimeout(() => {
+      timeScaleDisplay.classList.remove('visible');
+    }, 1200); // visible duration
   }
-});
 
 
   // Sun as primary light source
