@@ -41,7 +41,7 @@ function main() {
   })
   planets.push(sun);
 
-  
+
 
   const mercury = Planets.createBody(scene, 5, 0.038, 1.5, 0, 0, 'assets/mercury.jpg');
   planets.push(mercury);
@@ -51,7 +51,7 @@ function main() {
 
   const earth = Planets.createBody(scene, 5, 0.1, 3.0, 0, 0, 'assets/8k_earth_daymap.jpg');
   planets.push(earth);
-  
+
   // Add Earth's Moon
   const moon = Planets.createBody(scene, 0.1, 0.037, 3.25, 0, 0, 'assets/moon.jpg');
   moon.earthOrbit = { radius: 0.35, angle: 0, speed: 0.1 };
@@ -68,7 +68,7 @@ function main() {
 
   const saturn = Planets.createBody(scene, 5, 0.30, 12.0, 0, 0, 'assets/saturn.jpg');
   planets.push(saturn);
-  
+
   // Add Saturn's rings
   Planets.createSaturnRings(scene, saturn);
 
@@ -89,7 +89,7 @@ function main() {
   const saturnLabel = Planets.createLabel('Saturn', saturn.position, scene);
   const uranusLabel = Planets.createLabel('Uranus', uranus.position, scene);
   const neptuneLabel = Planets.createLabel('Neptune', neptune.position, scene);
-  
+
   // Track planet-label pairs for updating positions
   const planetLabels = [
     { planet: sun, label: sunLabel },
@@ -157,12 +157,15 @@ function main() {
   const sunLight = new THREE.PointLight(0xffffff, 2.5, 100);
   sunLight.position.set(0, 0, 0);  // Fixed at Sun's center
   scene.add(sunLight);
-  
+
   // Gentle ambient light for night-side visibility
   scene.add(new THREE.AmbientLight(0xffffff, 0.15));
 
-
-
+  //throw in a temp light
+  const light = new THREE.PointLight(0xffffff, 100, 100);
+  light.position.set(0, 0, 0);
+  scene.add(light);
+  scene.add(new THREE.AmbientLight(0xffffff, 1))
 
   function animate() {
     // Rotate planets on their axes
@@ -179,7 +182,7 @@ function main() {
         planet.position.x = Math.cos(planet.orbitAngle) * planet.orbitRadius;
         planet.position.z = Math.sin(planet.orbitAngle) * planet.orbitRadius;
       }
-      
+
       // Update rings if they exist (Saturn)
       if (planet.rings) {
         planet.rings.position.copy(planet.position);
