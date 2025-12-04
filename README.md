@@ -67,6 +67,8 @@ Then open **http://localhost:5173/** in your browser.
 - **Scroll Wheel**: Zoom in/out
 - **Click Planet**: Camera tracks planet
 - **Escape**: Stop camera tracking planet
+- **1/2**: Rough/Fine time slow down
+- **3/4** Fine/Rough time speed up
 
 ## Technical Details
 
@@ -84,6 +86,7 @@ Then open **http://localhost:5173/** in your browser.
 - Orbital speeds decrease with distance from Sun (Kepler's laws inspired)
 - Labels use Canvas texture rendering as Three.js Sprites
 - Asteroid belt optimized with cloned materials
+- Simulation Speed changeable with UI display
 
 ## Future Improvements
 
