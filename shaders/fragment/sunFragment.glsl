@@ -5,7 +5,7 @@ uniform float time;
 
 varying vec2 vUv;
 varying vec3 vPosition;
-
+//This code is based on this article: https://sangillee.com/2024-06-29-create-realistic-sun-with-shaders/
 float random (in vec3 st) {
     return fract(sin(dot(st,vec3(12.9898,78.233,23.112))) * 12943.145);
 }
