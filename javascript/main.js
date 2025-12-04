@@ -162,18 +162,32 @@ function main() {
   window.addEventListener('keydown', (event) => {
 
   switch (event.key) {
-    case '1': // slow time
-      timeScale = Math.max(MIN_TIME_SCALE, timeScale * 0.8);
+    case '1': // rough slow
+      timeScale = Math.max(MIN_TIME_SCALE, timeScale * 0.7);
       console.log(`Time scale: ${timeScale.toFixed(3)}`);
       showTimeScale();
       break;
 
-    case '2': // speed up time
+    case '2': // fine slow
+      timeScale = Math.max(MIN_TIME_SCALE, timeScale * 0.9);
+      console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
+      break;
+
+    case '3': //fine speed
+      timeScale = Math.min(MAX_TIME_SCALE, timeScale * 1.1);
+      console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
+      break;
+    case '4': //rough speed
       timeScale = Math.min(MAX_TIME_SCALE, timeScale * 1.25);
       console.log(`Time scale: ${timeScale.toFixed(3)}`);
       showTimeScale();
       break;
     }
+
+    
+
   });
 
   // Element to display time scale to user
