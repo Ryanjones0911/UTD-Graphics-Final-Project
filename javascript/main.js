@@ -124,6 +124,11 @@ function main() {
     neptune: 0.0001
   };
 
+  // Define a variable for the time scale along with minimum and maximum bounds
+  let timeScale = 1;
+  const MIN_TIME_SCALE = 0.01;
+  const MAX_TIME_SCALE = 10;
+
   mercury.speed = orbitalSpeeds.mercury;
   venus.speed = orbitalSpeeds.venus;
   earth.speed = orbitalSpeeds.earth;
@@ -153,6 +158,56 @@ function main() {
     }
   }
 
+  //handle keyboard inputs for changing timescale
+  window.addEventListener('keydown', (event) => {
+
+  switch (event.key) {
+    case '1': // rough slow
+      timeScale = Math.max(MIN_TIME_SCALE, timeScale * 0.7);
+      console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
+      break;
+
+    case '2': // fine slow
+      timeScale = Math.max(MIN_TIME_SCALE, timeScale * 0.9);
+      console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
+      break;
+
+    case '3': //fine speed
+      timeScale = Math.min(MAX_TIME_SCALE, timeScale * 1.1);
+      console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
+      break;
+    case '4': //rough speed
+      timeScale = Math.min(MAX_TIME_SCALE, timeScale * 1.25);
+      console.log(`Time scale: ${timeScale.toFixed(3)}`);
+      showTimeScale();
+      break;
+    }
+
+    
+
+  });
+
+  // Element to display time scale to user
+  const timeScaleDisplay = document.createElement('div'); 
+  timeScaleDisplay.id = 'time-scale-display';
+  document.body.appendChild(timeScaleDisplay);
+
+  let fadeTimeout = null;
+  //Function to display the time scale before fading it back out
+  function showTimeScale() {
+    timeScaleDisplay.textContent = `Time Scale: ${timeScale.toFixed(2)}×`;
+    timeScaleDisplay.classList.add('visible');
+
+    clearTimeout(fadeTimeout);
+    fadeTimeout = setTimeout(() => {
+      timeScaleDisplay.classList.remove('visible');
+    }, 1200); // visible duration
+  }
+
+
   // Sun as primary light source
   const sunLight = new THREE.PointLight(0xffffff, 2.5, 100);
   sunLight.position.set(0, 0, 0);  // Fixed at Sun's center
@@ -169,16 +224,16 @@ function main() {
 
   function animate() {
     // Rotate planets on their axes
-    sun.rotation.y += .002;
-    earth.rotation.y += .002;
-    mars.rotation.y += .002;
-    jupiter.rotation.y += .001;
-    saturn.rotation.y += .001;
+    sun.rotation.y += .002 * timeScale;
+    earth.rotation.y += .002 * timeScale;
+    mars.rotation.y += .002 * timeScale;
+    jupiter.rotation.y += .001 * timeScale;
+    saturn.rotation.y += .001 * timeScale;
 
     // Orbital motion for all planets except Sun
     [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach(planet => {
       if (planet.speed) {
-        planet.orbitAngle += planet.speed;
+        planet.orbitAngle += planet.speed * timeScale;
         planet.position.x = Math.cos(planet.orbitAngle) * planet.orbitRadius;
         planet.position.z = Math.sin(planet.orbitAngle) * planet.orbitRadius;
       }
@@ -191,14 +246,14 @@ function main() {
 
     // Moon orbits Earth
     if (moon.earthOrbit) {
-      moon.earthOrbit.angle += moon.earthOrbit.speed;
+      moon.earthOrbit.angle += moon.earthOrbit.speed * timeScale;
       moon.position.x = earth.position.x + Math.cos(moon.earthOrbit.angle) * moon.earthOrbit.radius;
       moon.position.z = earth.position.z + Math.sin(moon.earthOrbit.angle) * moon.earthOrbit.radius;
     }
 
     // Move asteroids
     asteroids.forEach(asteroid => {
-      asteroid.orbitAngle += asteroid.speed;
+      asteroid.orbitAngle += asteroid.speed * timeScale;
       asteroid.position.x = Math.cos(asteroid.orbitAngle) * asteroid.orbitRadius;
       asteroid.position.z = Math.sin(asteroid.orbitAngle) * asteroid.orbitRadius;
     });
