@@ -68,7 +68,8 @@ Then open **http://localhost:5173/** in your browser.
 - **Click Planet**: Camera tracks planet
 - **Escape**: Stop camera tracking planet
 - **1/2**: Rough/Fine time slow down
-- **3/4** Fine/Rough time speed up
+- **3/4**: Fine/Rough time speed up
+- **C**: Camera tracking Comet
 
 ## Technical Details
 
