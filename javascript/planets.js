@@ -117,7 +117,7 @@ export function createAsteroidBelt(currScene, innerRadius = 5.0, outerRadius = 6
 
 export function createComet(scene, sun, startAngle = 0) {
   // ----- comet head -----
-  const radius = 0.08;
+  const radius = 0.05;
   const geom = new THREE.SphereGeometry(radius, 16, 16);
   const mat = new THREE.MeshPhongMaterial({
     color: 0xffffff,
@@ -137,7 +137,6 @@ export function createComet(scene, sun, startAngle = 0) {
 
     inclination: THREE.MathUtils.degToRad(15),  // tilt
     longitude: THREE.MathUtils.degToRad(20),
-
     radius,
     trail: [],
     spawnTimer: 0

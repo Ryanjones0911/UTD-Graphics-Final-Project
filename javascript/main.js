@@ -28,6 +28,8 @@ function main() {
 
   camera.position.z = 8;
 
+  const tailNoise   = new THREE.Vector3();//To be used to add some variation to comet's tail particles
+
   const controls = CameraControls.controlsInit(camera, renderer.domElement);
   // Have target to have camera able to follow with planets
   let followTarget = null;        // the planet the camera should follow
@@ -391,10 +393,10 @@ function updateCometTrail(scene, comet, dt) {
 
   const awayFromSun = new THREE.Vector3().subVectors(comet.position, sunPos).normalize();
 
-  // spawn
+  // spawn particles
   data.spawnTimer = (data.spawnTimer ?? 0) - dt;
   if (data.spawnTimer <= 0) {
-    data.spawnTimer = 0.025;
+    data.spawnTimer = 0.012; //reduce if needed for lag reduction
     const mat = new THREE.MeshPhongMaterial({
       color: 0x88ccff,
       emissive: 0x446688,
@@ -402,10 +404,10 @@ function updateCometTrail(scene, comet, dt) {
       opacity: 1
     });
     const p = new THREE.Mesh(particleGeo, mat);
-    p.position.copy(comet.position).addScaledVector(awayFromSun, -data.radius * 1.3);
+    p.position.copy(comet.position).addScaledVector(awayFromSun, -data.radius * 1.3).add(tailNoise);
     p.userData = {
       velocity: awayFromSun.clone().multiplyScalar(0.15),
-      life: 1.0
+      life: 1.0//how long trail lasts
     };
     scene.add(p);
     trail.push(p);
