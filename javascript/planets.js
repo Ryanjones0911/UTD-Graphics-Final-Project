@@ -115,6 +115,37 @@ export function createAsteroidBelt(currScene, innerRadius = 5.0, outerRadius = 6
   return asteroids;
 }
 
+export function createComet(scene, sun, startAngle = 0) {
+  // ----- comet head -----
+  const radius = 0.08;
+  const geom = new THREE.SphereGeometry(radius, 16, 16);
+  const mat = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    emissive: 0x8899ff,
+    shininess: 80
+  });
+
+  const comet = new THREE.Mesh(geom, mat);
+
+  // ----- orbit params (ELLIPTICAL) -----
+  comet.userData = {
+    sun,
+    angle: startAngle,
+    speed: 0.015,     // base angular speed
+    a: 18,            // semi-major axis
+    b: 6,             // semi-minor axis
+
+    radius,
+    trail: [],
+    spawnTimer: 0
+  };
+
+  scene.add(comet);
+  return comet;
+}
+
+
+
 export function createLabel(name, position, scene) {
   const canvas = document.createElement('canvas');
   canvas.width = 256;

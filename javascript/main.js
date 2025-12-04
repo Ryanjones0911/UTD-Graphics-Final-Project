@@ -205,6 +205,11 @@ function main() {
   Planets.createOrbitLine(scene, uranus.orbitRadius);
   Planets.createOrbitLine(scene, neptune.orbitRadius);
 
+  // creating comet
+  const comet = Planets.createComet(scene, sun, Math.PI * 0.7);
+  followTarget = comet; // for debugging so camear follows it
+
+  
   // Define orbital speeds (inner planets faster, outer planets slower)
   const orbitalSpeeds = {
     mercury: 0.04,
@@ -348,6 +353,66 @@ window.addEventListener('keydown', (e) => {
   scene.add(light);
   scene.add(new THREE.AmbientLight(0xffffff, 1))
 
+  // eliptical orbit for the comet
+  function updateCometOrbit(comet, timeScale) {
+    const d = comet.userData;
+
+    // speed up near the Sun
+    const dist = comet.position.length();
+    const boost = THREE.MathUtils.clamp(6 / dist, 0.5, 3.0);
+
+    d.angle += d.speed * boost * timeScale;
+
+    comet.position.x = Math.cos(d.angle) * d.a;
+    comet.position.z = Math.sin(d.angle) * d.b;
+  }
+
+  const particleGeo = new THREE.SphereGeometry(0.02, 6, 6);
+
+function updateCometTrail(scene, comet, dt) {
+  if (!comet || !comet.userData) return;
+  const data = comet.userData;
+  const sunPos = data.sun.position;
+  const trail = data.trail || (data.trail = []);
+
+  const awayFromSun = new THREE.Vector3().subVectors(comet.position, sunPos).normalize();
+
+  // spawn
+  data.spawnTimer = (data.spawnTimer ?? 0) - dt;
+  if (data.spawnTimer <= 0) {
+    data.spawnTimer = 0.025;
+    const mat = new THREE.MeshPhongMaterial({
+      color: 0x88ccff,
+      emissive: 0x446688,
+      transparent: true,
+      opacity: 1
+    });
+    const p = new THREE.Mesh(particleGeo, mat);
+    p.position.copy(comet.position).addScaledVector(awayFromSun, -data.radius * 1.3);
+    p.userData = {
+      velocity: awayFromSun.clone().multiplyScalar(0.15),
+      life: 1.0
+    };
+    scene.add(p);
+    trail.push(p);
+  }
+
+  // update
+  for (let i = trail.length - 1; i >= 0; i--) {
+    const p = trail[i];
+    p.position.addScaledVector(p.userData.velocity, dt);
+    p.userData.life -= dt * 0.6;
+    p.material.opacity = Math.max(0, p.userData.life);
+    p.scale.multiplyScalar(0.985);
+    if (p.userData.life <= 0.02) {
+      scene.remove(p);
+      trail.splice(i, 1);
+    }
+  }
+}
+
+  
+
   function animate() {
     // Rotate planets on their axes
     sun.rotation.y += .002 * timeScale;
@@ -386,6 +451,10 @@ window.addEventListener('keydown', (e) => {
       asteroid.position.x = Math.cos(asteroid.orbitAngle) * asteroid.orbitRadius;
       asteroid.position.z = Math.sin(asteroid.orbitAngle) * asteroid.orbitRadius;
     });
+    
+    //update comet stuff
+    updateCometOrbit(comet, timeScale);
+    updateCometTrail(scene, comet, 0.016 * timeScale);
 
     // Update label positions
     planetLabels.forEach(({ planet, label }) => {
