@@ -65,7 +65,8 @@ Then open **http://localhost:5173/** in your browser.
 
 - **Mouse Drag**: Rotate camera view
 - **Scroll Wheel**: Zoom in/out
-- **Click Planet**: Center camera on that planet
+- **Click Planet**: Camera tracks planet
+- **Escape**: Stop camera tracking planet
 
 ## Technical Details
 
