@@ -207,7 +207,7 @@ function main() {
 
   // creating comet
   const comet = Planets.createComet(scene, sun, Math.PI * 0.7);
-  followTarget = comet; // for debugging so camear follows it
+  //followTarget = comet; // for debugging so camear follows it
 
   
   // Define orbital speeds (inner planets faster, outer planets slower)
@@ -281,6 +281,14 @@ function main() {
 
 }
 //Allow to stop following a planet by hitting escape
+window.addEventListener('keydown', (c) => {
+  if (c.key === 'c') {
+    followTarget = comet;//Reset follow target to null when esc pressed
+    planetInfoPanel.style.display = 'none';//reset planet info panel as well
+    console.log("Following comet");
+  }
+});
+
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     followTarget = null;//Reset follow target to null when esc pressed
@@ -355,17 +363,23 @@ window.addEventListener('keydown', (e) => {
 
   // eliptical orbit for the comet
   function updateCometOrbit(comet, timeScale) {
-    const d = comet.userData;
+  const d = comet.userData;
+  const dist = comet.position.length();
+  const speedBoost = THREE.MathUtils.clamp(6 / (dist + 0.01), 0.5, 3.0);
+  d.angle += d.speed * speedBoost * timeScale;
+  const localPos = new THREE.Vector3(
+    Math.cos(d.angle) * d.a,
+    0,
+    Math.sin(d.angle) * d.b
+  );
 
-    // speed up near the Sun
-    const dist = comet.position.length();
-    const boost = THREE.MathUtils.clamp(6 / dist, 0.5, 3.0);
+  localPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), d.longitude);
 
-    d.angle += d.speed * boost * timeScale;
+  localPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), d.inclination);
 
-    comet.position.x = Math.cos(d.angle) * d.a;
-    comet.position.z = Math.sin(d.angle) * d.b;
-  }
+  comet.position.copy(localPos);
+}
+
 
   const particleGeo = new THREE.SphereGeometry(0.02, 6, 6);
 

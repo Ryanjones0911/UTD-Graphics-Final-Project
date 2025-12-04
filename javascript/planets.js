@@ -135,6 +135,9 @@ export function createComet(scene, sun, startAngle = 0) {
     a: 18,            // semi-major axis
     b: 6,             // semi-minor axis
 
+    inclination: THREE.MathUtils.degToRad(15),  // tilt
+    longitude: THREE.MathUtils.degToRad(20),
+
     radius,
     trail: [],
     spawnTimer: 0
