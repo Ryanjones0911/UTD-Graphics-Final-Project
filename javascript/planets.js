@@ -1,4 +1,17 @@
 import * as THREE from 'three';
+import sunVS from '../shaders/vertex/sunVertex.glsl?raw';
+import sunFS from '../shaders/fragment/sunFragment.glsl?raw';
+
+const sunTexture = new THREE.TextureLoader().load('assets/sun.jpg');
+
+const sunMaterial = new THREE.ShaderMaterial({
+  vertexShader: sunVS,
+  fragmentShader: sunFS,
+  uniforms: {
+    time: { value: 0 },
+    sunMap: { value: sunTexture }
+  }
+});
 
 export function createBody(currScene, mass, radius, x, y, z, texture = null, options = {}) {
   var bodyTexture = null;
@@ -11,14 +24,20 @@ export function createBody(currScene, mass, radius, x, y, z, texture = null, opt
   // Special handling for the Sun to make it glow
   const isSun = options.emissive !== undefined && options.emissive === 0xffaa33;
   
-  const bodyMat = new THREE.MeshPhongMaterial({
-    map: bodyTexture,
-    emissiveMap: isSun ? bodyTexture : null,
-    shininess: 30,
-    specular: 0x444444,
-    ...options
-    //this will be replaced with custom shaders at some point in the future 
-  })
+  let bodyMat;
+
+  if (isSun) {
+    bodyMat = sunMaterial; 
+  } else {
+    bodyMat = new THREE.MeshPhongMaterial({
+      map: bodyTexture,
+      emissiveMap: bodyTexture,
+      shininess: 30,
+      specular: 0x444444,
+      ...options
+    });
+  }
+
 
   const body = new THREE.Mesh(bodyGeo, bodyMat);
 

@@ -355,6 +355,9 @@ window.addEventListener('keydown', (e) => {
     mars.rotation.y += .002 * timeScale;
     jupiter.rotation.y += .001 * timeScale;
     saturn.rotation.y += .001 * timeScale;
+    if (sun.material?.uniforms?.time) {
+      sun.material.uniforms.time.value += 0.02;
+    }
 
     // Orbital motion for all planets except Sun
     [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach(planet => {

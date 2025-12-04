@@ -87,6 +87,7 @@ Then open **http://localhost:5173/** in your browser.
 - Labels use Canvas texture rendering as Three.js Sprites
 - Asteroid belt optimized with cloned materials
 - Simulation Speed changeable with UI display
+- Custom sun shader with simulated surface plasma
 
 ## Future Improvements
 
