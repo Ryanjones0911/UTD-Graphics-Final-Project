@@ -28,6 +28,8 @@ function main() {
 
   camera.position.z = 8;
 
+  const tailNoise   = new THREE.Vector3();//To be used to add some variation to comet's tail particles
+
   const controls = CameraControls.controlsInit(camera, renderer.domElement);
   // Have target to have camera able to follow with planets
   let followTarget = null;        // the planet the camera should follow
@@ -205,6 +207,11 @@ function main() {
   Planets.createOrbitLine(scene, uranus.orbitRadius);
   Planets.createOrbitLine(scene, neptune.orbitRadius);
 
+  // creating comet
+  const comet = Planets.createComet(scene, sun, Math.PI * 0.7);
+  //followTarget = comet; // for debugging so camear follows it
+
+  
   // Define orbital speeds (inner planets faster, outer planets slower)
   const orbitalSpeeds = {
     mercury: 0.04,
@@ -276,6 +283,14 @@ function main() {
 
 }
 //Allow to stop following a planet by hitting escape
+window.addEventListener('keydown', (c) => {
+  if (c.key === 'c') {
+    followTarget = comet;//Reset follow target to null when esc pressed
+    planetInfoPanel.style.display = 'none';//reset planet info panel as well
+    console.log("Following comet");
+  }
+});
+
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     followTarget = null;//Reset follow target to null when esc pressed
@@ -348,6 +363,72 @@ window.addEventListener('keydown', (e) => {
   scene.add(light);
   scene.add(new THREE.AmbientLight(0xffffff, 1))
 
+  // eliptical orbit for the comet
+  function updateCometOrbit(comet, timeScale) {
+  const d = comet.userData;
+  const dist = comet.position.length();
+  const speedBoost = THREE.MathUtils.clamp(6 / (dist + 0.01), 0.5, 3.0);
+  d.angle += d.speed * speedBoost * timeScale;
+  const localPos = new THREE.Vector3(
+    Math.cos(d.angle) * d.a,
+    0,
+    Math.sin(d.angle) * d.b
+  );
+
+  localPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), d.longitude);
+
+  localPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), d.inclination);
+
+  comet.position.copy(localPos);
+}
+
+
+  const particleGeo = new THREE.SphereGeometry(0.02, 6, 6);
+
+function updateCometTrail(scene, comet, dt) {
+  if (!comet || !comet.userData) return;
+  const data = comet.userData;
+  const sunPos = data.sun.position;
+  const trail = data.trail || (data.trail = []);
+
+  const awayFromSun = new THREE.Vector3().subVectors(comet.position, sunPos).normalize();
+
+  // spawn particles
+  data.spawnTimer = (data.spawnTimer ?? 0) - dt;
+  if (data.spawnTimer <= 0) {
+    data.spawnTimer = 0.012; //reduce if needed for lag reduction
+    const mat = new THREE.MeshPhongMaterial({
+      color: 0x88ccff,
+      emissive: 0x446688,
+      transparent: true,
+      opacity: 1
+    });
+    const p = new THREE.Mesh(particleGeo, mat);
+    p.position.copy(comet.position).addScaledVector(awayFromSun, -data.radius * 1.3).add(tailNoise);
+    p.userData = {
+      velocity: awayFromSun.clone().multiplyScalar(0.15),
+      life: 1.0//how long trail lasts
+    };
+    scene.add(p);
+    trail.push(p);
+  }
+
+  // update
+  for (let i = trail.length - 1; i >= 0; i--) {
+    const p = trail[i];
+    p.position.addScaledVector(p.userData.velocity, dt);
+    p.userData.life -= dt * 0.6;
+    p.material.opacity = Math.max(0, p.userData.life);
+    p.scale.multiplyScalar(0.985);
+    if (p.userData.life <= 0.02) {
+      scene.remove(p);
+      trail.splice(i, 1);
+    }
+  }
+}
+
+  
+
   function animate() {
     // Rotate planets on their axes
     sun.rotation.y += .002 * timeScale;
@@ -386,6 +467,10 @@ window.addEventListener('keydown', (e) => {
       asteroid.position.x = Math.cos(asteroid.orbitAngle) * asteroid.orbitRadius;
       asteroid.position.z = Math.sin(asteroid.orbitAngle) * asteroid.orbitRadius;
     });
+    
+    //update comet stuff
+    updateCometOrbit(comet, timeScale);
+    updateCometTrail(scene, comet, 0.016 * timeScale);
 
     // Update label positions
     planetLabels.forEach(({ planet, label }) => {
